@@ -17,213 +17,180 @@
 <style>
 :root{
   --ink:#0A1520;--blue2:#378ADD;
-  --yellow:#f0b429;--orange:#cc6600;
+  --yellow:#f0b429;--ochre:#CBAC7A;--terra:#AF6C5F;
   --purple:#534AB7;--purple2:#7F77DD;
-  --dark:#1A1A2E;--pocket:#2A2A3E;
-  --green:#2d6a2d;--gray:#5F5E5A;
-  --cream:#f8f0dc;--cream2:#ede0c0;
+  --gray:#5F5E5A;
+  --wall:#F4EDDE;--wall2:#EDE3CB;
+  --night:#081426;
+  --wood:#2f241a;--mat:#f7f1e3;
   --brown:#4a2005;--red:#D85A30;
+  --ease-hall:cubic-bezier(.785,.135,.15,.86);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Noto Serif SC','PingFang SC','Microsoft YaHei',serif;overflow-x:hidden;background:var(--ink);}
+::selection{background:rgba(240,180,40,.25);}
+section{scroll-margin-top:56px;}
 
-/* NAVBAR */
-#navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,16,28,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(240,180,40,.12);}
+/* ── WAYFINDING (navbar) ── */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,14,26,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(240,180,40,.12);}
 .nav-a{color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;letter-spacing:.06em;transition:color .2s;font-family:'PingFang SC','Microsoft YaHei',sans-serif;}
 .nav-a:hover{color:var(--yellow)}
 #mob-menu{display:none;flex-direction:column;gap:2px;padding:8px 16px 14px;}
 #mob-menu.open{display:flex}
 #mob-menu .nav-a{display:flex;align-items:center;min-height:44px;padding:0 8px;}
 
-/* HERO */
+/* ── 导览角标 & 暂停开关 ── */
+#hall-tag{position:fixed;left:18px;bottom:16px;z-index:90;font-family:monospace;font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.42);display:flex;align-items:center;gap:8px;pointer-events:none;mix-blend-mode:difference;}
+#hall-tag b{color:rgba(240,180,40,.85);font-weight:700;}
+#pause-bg{position:fixed;right:18px;bottom:14px;z-index:90;min-height:36px;padding:0 14px;border-radius:2em;border:1px dashed rgba(240,180,40,.5);background:rgba(8,14,26,.55);backdrop-filter:blur(8px);color:rgba(240,180,40,.85);font-size:11px;letter-spacing:.1em;cursor:pointer;font-family:'PingFang SC',monospace;transition:all .2s;}
+#pause-bg:hover{border-color:var(--yellow);color:var(--yellow);}
+
+/* ── 01 序厅 HERO ── */
 #hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;}
-#vg-canvas{position:absolute;inset:0;width:100%;height:100%;}
-.hero-veil{position:absolute;inset:0;background:linear-gradient(to right,rgba(6,12,22,.95) 0%,rgba(6,12,22,.88) 30%,rgba(6,12,22,.55) 55%,rgba(6,12,22,.15) 72%,transparent 85%);}
-.hero-txt{position:relative;z-index:2;padding:0 clamp(20px,5vw,80px);max-width:700px;}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(240,180,40,.35);background:rgba(240,180,40,.08);color:rgba(240,180,40,.9);font-size:12px;letter-spacing:.1em;padding:5px 14px;border-radius:999px;margin-bottom:28px;font-family:sans-serif;}
-#h-title{font-size:clamp(40px,6.5vw,88px);font-weight:900;color:#fff;line-height:1.08;letter-spacing:-.01em;text-shadow:0 4px 40px rgba(0,0,0,.6);opacity:0;transform:translateY(36px);}
-#h-sub{font-size:clamp(14px,1.6vw,18px);color:rgba(255,255,255,.55);margin-top:20px;margin-bottom:36px;line-height:1.75;font-weight:400;max-width:480px;opacity:0;transform:translateY(20px);}
-#h-btns{display:flex;gap:12px;flex-wrap:wrap;opacity:0;}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:600;border:none;cursor:pointer;text-decoration:none;color:#fff;letter-spacing:.04em;transition:transform .18s,box-shadow .22s,background .2s;font-family:'PingFang SC',sans-serif;}
-.btn:hover{transform:translateY(-2px);}
-.btn-y{background:var(--yellow);color:#1a0800;box-shadow:0 4px 20px rgba(240,180,40,.3);}
-.btn-y:hover{background:#ffc83a;box-shadow:0 8px 28px rgba(240,180,40,.45);}
-.btn-g{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);}
-.btn-g:hover{background:rgba(255,255,255,.17);}
-.btn-p{background:var(--purple);box-shadow:0 4px 18px rgba(83,74,183,.35);}
+#vg-canvas,#vg-live{position:absolute;inset:0;width:100%;height:100%;}
+#vg-live{pointer-events:none;}
+.hero-veil{position:absolute;inset:0;background:linear-gradient(to right,rgba(6,12,22,.72) 0%,rgba(6,12,22,.45) 38%,rgba(6,12,22,.08) 62%,transparent 80%);}
+.hero-inner{position:relative;z-index:2;padding:0 clamp(20px,6vw,90px);max-width:820px;}
+.island{display:inline-block;background:var(--wall);padding:clamp(22px,3.4vw,44px) clamp(24px,3.8vw,52px);box-shadow:0 24px 70px rgba(0,0,0,.45);}
+.hall-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:monospace;font-size:11px;letter-spacing:.22em;color:var(--terra);margin-bottom:18px;}
+.hall-eyebrow::before{content:'';width:22px;height:1px;background:var(--terra);}
+#h-title{font-size:clamp(38px,6vw,80px);font-weight:900;color:#141c2e;line-height:1.06;letter-spacing:-.01em;}
+#h-sub{font-size:clamp(14px,1.5vw,17px);color:#5c5240;margin-top:18px;line-height:1.85;font-weight:400;max-width:440px;}
+#h-sub em{font-style:normal;color:var(--terra);border-bottom:1px solid rgba(175,108,95,.4);}
+#h-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:13px 28px;border-radius:3px;font-size:14px;font-weight:600;border:none;cursor:pointer;text-decoration:none;letter-spacing:.04em;transition:background .2s,color .2s;font-family:'PingFang SC',sans-serif;}
+.btn-y{background:#141c2e;color:var(--wall);}
+.btn-y:hover{background:#24304e;}
+.btn-g{background:transparent;border:1px dashed rgba(20,28,46,.45);color:#141c2e;}
+.btn-g:hover{border-color:#141c2e;border-style:solid;}
+.btn-p{background:var(--purple);color:#fff;}
 .btn-p:hover{background:var(--purple2);}
-.scroll-hint{position:absolute;bottom:36px;left:clamp(20px,5vw,80px);z-index:2;display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.12em;color:rgba(255,255,255,.3);font-family:sans-serif;}
-.scroll-line{width:40px;height:1px;background:rgba(255,255,255,.2);}
+.scroll-hint{position:absolute;bottom:56px;left:clamp(20px,6vw,90px);z-index:2;display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.18em;color:rgba(255,255,255,.55);font-family:monospace;}
+.scroll-line{width:44px;height:1px;background:rgba(255,255,255,.35);position:relative;overflow:visible;}
+.scroll-line::after{content:'';position:absolute;right:-1px;top:-2.5px;width:6px;height:6px;border-top:1px solid rgba(255,255,255,.5);border-right:1px solid rgba(255,255,255,.5);transform:rotate(135deg);}
 
-/* PRODUCTS */
-#products{background:var(--cream);padding:80px clamp(16px,5vw,80px);}
-.sec-title{font-size:clamp(22px,3.5vw,38px);font-weight:900;letter-spacing:.04em;line-height:1.1;}
-.p-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 20px rgba(74,32,5,.08);cursor:pointer;border:1px solid rgba(74,32,5,.08);transition:box-shadow .25s,transform .2s;}
-.p-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(74,32,5,.15);}
-.flip-wrap{perspective:1000px;height:300px;}
-.flip-inner{width:100%;height:100%;position:relative;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
-.flip-wrap.flipped .flip-inner{transform:rotateY(180deg)}
-.flip-f,.flip-b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:7px;}
-.flip-b{transform:rotateY(180deg);}
-.p-card:focus-visible,.tl-n:focus-visible{outline:2px solid var(--blue2);outline-offset:2px;border-radius:8px;}
+/* ── 展厅公共 ── */
+.hall{padding:clamp(72px,9vw,120px) clamp(18px,5vw,80px);position:relative;}
+.hall-head{max-width:1200px;margin:0 auto clamp(40px,5vw,64px);}
+.hall-eyebrow-l{font-family:monospace;font-size:11px;letter-spacing:.22em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.hall-eyebrow-l::before{content:'';width:22px;height:1px;background:currentColor;}
+.hall-title{font-size:clamp(26px,3.6vw,44px);font-weight:900;letter-spacing:.02em;line-height:1.15;}
+.hall-note{font-size:13px;line-height:1.8;margin-top:12px;font-family:'PingFang SC',sans-serif;max-width:520px;}
 
-/* BOOKS */
-#books{position:relative;padding:80px clamp(16px,5vw,80px);overflow:hidden;background:#06101e;}
+/* ── 02 展品 ── */
+#products{background:var(--wall);}
+#products .hall-eyebrow-l{color:var(--terra);}
+#products .hall-title{color:#1c2233;}
+#products .hall-note{color:#8a7c62;}
+.exhibit-grid{display:grid;grid-template-columns:7fr 5fr;gap:clamp(28px,4vw,64px);max-width:1200px;margin:0 auto;align-items:start;}
+.exhibit{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease-hall),transform .9s var(--ease-hall);}
+.exhibit.seen{opacity:1;transform:none;}
+.exhibit:nth-child(2){margin-top:clamp(30px,5vw,90px);}
+.exhibit:nth-child(3){grid-column:2;}
+.frame{background:var(--wood);padding:clamp(8px,1vw,12px);box-shadow:0 18px 50px rgba(40,26,10,.28),0 2px 8px rgba(40,26,10,.2);}
+.frame-mat{background:var(--mat);padding:clamp(10px,1.4vw,18px);}
+.frame canvas{display:block;width:100%;height:auto;}
+.mlabel{max-width:78%;margin-top:18px;padding-top:12px;border-top:1px solid rgba(74,32,5,.22);font-family:'PingFang SC',sans-serif;}
+.mlabel .row1{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.mlabel h3{font-size:15px;font-weight:700;color:#2a2114;letter-spacing:.02em;font-family:'Noto Serif SC',serif;}
+.mlabel .no{font-family:monospace;font-size:10px;letter-spacing:.16em;color:var(--terra);white-space:nowrap;}
+.mlabel .medium{font-size:11px;color:#9a8a6c;letter-spacing:.06em;margin-top:3px;font-family:monospace;}
+.mlabel p{font-size:13px;color:#6b5f4c;line-height:1.75;margin-top:8px;}
+.mlabel .go{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:12.5px;font-weight:600;color:#1c2233;text-decoration:none;letter-spacing:.05em;border-bottom:1px solid #1c2233;padding-bottom:2px;transition:color .2s,border-color .2s;min-height:32px;}
+.mlabel .go:hover{color:var(--terra);border-color:var(--terra);}
+.mlabel .go.soon{border-bottom-style:dashed;color:#9a8a6c;cursor:pointer;}
+
+/* ── 03 书房 ── */
+#books{background:var(--night);overflow:hidden;}
 #books-canvas{position:absolute;inset:0;width:100%;height:100%;}
-#books-veil{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,10,20,.82) 0%,rgba(6,10,20,.72) 50%,rgba(6,10,20,.88) 100%);}
-.book-card{
-  display:flex;gap:16px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(240,180,40,.12);
-  border-radius:10px;padding:16px;
-  transition:transform .2s,border-color .2s,box-shadow .2s;
-  position:relative;overflow:hidden;
-}
-.book-card:hover{transform:translateY(-4px);border-color:rgba(240,180,40,.35);box-shadow:0 8px 32px rgba(240,180,40,.08);}
-.book-cover{
-  width:72px;height:100px;border-radius:4px;flex-shrink:0;
-  object-fit:cover;background:linear-gradient(135deg,#2a3a6a,#1a2a4a);
-  display:flex;align-items:center;justify-content:center;font-size:22px;
-}
-.book-highlight{
-  background:rgba(240,180,40,.12);
-  border-left:3px solid var(--yellow);
-  padding:7px 10px;margin:8px 0;
-  font-style:italic;font-size:12px;color:rgba(240,180,40,.85);
-  border-radius:0 4px 4px 0;line-height:1.6;
-}
-.book-comment{font-size:13px;color:rgba(255,255,255,.65);line-height:1.7;}
-.book-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;}
-.weread-btn{
-  display:inline-flex;align-items:center;gap:5px;
-  margin-top:10px;font-size:11px;color:rgba(240,180,40,.7);
-  text-decoration:none;border:1px solid rgba(240,180,40,.3);
-  padding:4px 10px;border-radius:999px;transition:all .2s;font-family:sans-serif;
-}
-.weread-btn:hover{color:var(--yellow);border-color:var(--yellow);background:rgba(240,180,40,.08);}
+#books-veil{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,10,22,.84) 0%,rgba(5,10,22,.72) 50%,rgba(5,10,22,.88) 100%);}
+#books .hall-eyebrow-l{color:var(--yellow);}
+#books .hall-title{color:#fff;}
+#books .hall-note{color:rgba(255,255,255,.45);}
+.book-list{max-width:1000px;margin:0 auto;position:relative;z-index:1;display:grid;gap:0;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));column-gap:clamp(24px,3vw,48px);}
+.book-item{display:flex;gap:16px;padding:22px 4px;border-bottom:1px solid rgba(240,180,40,.14);align-items:flex-start;}
+.book-cover{width:64px;height:90px;border-radius:2px;flex-shrink:0;background:linear-gradient(135deg,#1a2a4a,#0a1a2a);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 18px rgba(0,0,0,.4);}
+.book-cover img{width:100%;height:100%;object-fit:cover;border-radius:2px;}
+.book-highlight{background:rgba(240,180,40,.1);border-left:2px solid var(--yellow);padding:7px 10px;margin:8px 0;font-size:12px;color:rgba(240,180,40,.88);line-height:1.7;}
+.book-comment{font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.7;}
+.book-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;}
+.weread-btn{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:11px;color:rgba(240,180,40,.7);text-decoration:none;letter-spacing:.05em;transition:color .2s;font-family:sans-serif;min-height:28px;}
+.weread-btn:hover{color:var(--yellow);}
 
-/* CONTACT */
-#contact{background:var(--cream2);padding:80px clamp(16px,5vw,80px);}
-.c-btn{width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(74,32,5,.08);color:var(--brown);transition:background .2s,color .2s,transform .18s,box-shadow .2s;}
-.c-btn:hover{background:var(--yellow);color:#1a0800;transform:translateY(-4px);box-shadow:0 8px 20px rgba(240,180,40,.35);}
+/* ── 04 互动装置 ── */
+#install{background:var(--wall2);text-align:center;}
+#install .hall-eyebrow-l{color:var(--purple);justify-content:center;}
+#install .hall-eyebrow-l::before{display:none;}
+#install .hall-title{color:#1c2233;}
+#install .hall-note{color:#8a7c62;margin-left:auto;margin-right:auto;}
+.ticket{display:inline-flex;align-items:center;gap:10px;margin-top:34px;padding:16px 34px;border:1.5px dashed var(--purple);border-radius:6px;background:transparent;color:var(--purple);font-size:15px;font-weight:700;letter-spacing:.08em;cursor:pointer;font-family:'Noto Serif SC',serif;transition:all .25s;min-height:52px;}
+.ticket:hover{background:var(--purple);color:#fff;border-style:solid;}
+.ticket small{font-weight:400;font-size:11px;letter-spacing:.12em;opacity:.7;font-family:monospace;}
 
-/* ═══ LIFE ONLINE — RPG GAME SCREEN ═══ */
-#life-ov{
-  position:fixed;inset:0;z-index:200;
-  background:#07080f;
-  display:none;overflow-y:auto;
-  background-image:
-    radial-gradient(rgba(83,74,183,.08) 1px,transparent 1px),
-    radial-gradient(rgba(55,138,221,.04) 1px,transparent 1px);
-  background-size:28px 28px,14px 14px;
-  background-position:0 0,7px 7px;
-}
+/* ── 05 留言台 / FOOTER ── */
+#contact{background:var(--wall);}
+#contact .hall-eyebrow-l{color:var(--terra);}
+#contact .hall-title{color:#1c2233;}
+#contact .hall-note{color:#8a7c62;}
+.contact-wrap{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:clamp(32px,5vw,80px);align-items:start;}
+.c-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 2px;border-bottom:1px solid rgba(74,32,5,.18);cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;width:100%;text-align:left;font-family:inherit;transition:background .2s;min-height:56px;}
+.c-row:first-child{border-top:1px solid rgba(74,32,5,.18);}
+.c-row:hover{background:rgba(203,172,122,.12);}
+.c-row .l{display:flex;align-items:center;gap:14px;}
+.c-row .l i{width:18px;height:18px;color:var(--terra);}
+.c-row .l .name{font-size:14.5px;font-weight:700;color:#2a2114;}
+.c-row .l .hint{font-size:12px;color:#9a8a6c;font-family:'PingFang SC',sans-serif;}
+.c-row .arr{font-family:monospace;font-size:13px;color:var(--terra);}
+.qr-block{text-align:center;}
+.qr-frame{background:var(--wood);padding:8px;box-shadow:0 14px 36px rgba(40,26,10,.25);}
+.qr-mat{background:var(--mat);padding:10px;}
+.qr-mat .inner{width:120px;height:120px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#e8e0ce;}
+.qr-mat img{width:100%;height:100%;object-fit:cover;}
+.qr-block p{font-size:11px;color:#9a8a6c;margin-top:10px;font-family:monospace;letter-spacing:.1em;}
+footer{background:var(--wall);border-top:1px solid rgba(74,32,5,.15);padding:26px clamp(18px,5vw,80px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:monospace;font-size:11px;letter-spacing:.12em;color:#9a8a6c;}
+
+/* ── LIFE ONLINE (RPG overlay) ── */
+#life-ov{position:fixed;inset:0;z-index:200;background:#07080f;display:none;overflow-y:auto;background-image:radial-gradient(rgba(83,74,183,.08) 1px,transparent 1px),radial-gradient(rgba(55,138,221,.04) 1px,transparent 1px);background-size:28px 28px,14px 14px;background-position:0 0,7px 7px;}
 #life-ov::-webkit-scrollbar{width:4px}
 #life-ov::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px}
-
-/* Game HUD bar */
-.game-hud{
-  position:sticky;top:0;z-index:10;
-  background:rgba(7,8,15,.92);backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(83,74,183,.3);
-  padding:10px 20px;
-  display:flex;justify-content:space-between;align-items:center;
-  font-family:monospace;font-size:11px;letter-spacing:.1em;
-  color:rgba(127,119,221,.7);
-}
+.game-hud{position:sticky;top:0;z-index:10;background:rgba(7,8,15,.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(83,74,183,.3);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;font-family:monospace;font-size:11px;letter-spacing:.1em;color:rgba(127,119,221,.7);}
 .game-hud span{display:flex;align-items:center;gap:6px;}
 .hud-dot{width:6px;height:6px;border-radius:50%;background:var(--purple2);box-shadow:0 0 6px var(--purple2);animation:blink 2s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* RPG card base */
-.rpg{
-  border-radius:12px;padding:20px;margin-bottom:12px;
-  opacity:0;transform:translateY(40px);
-  background:rgba(42,42,62,.7);
-  border:1px solid rgba(83,74,183,.3);
-  backdrop-filter:blur(4px);
-  position:relative;overflow:hidden;
-}
-.rpg::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(to right,transparent,rgba(127,119,221,.4),transparent);
-}
+.rpg{border-radius:12px;padding:20px;margin-bottom:12px;opacity:0;transform:translateY(40px);background:rgba(42,42,62,.7);border:1px solid rgba(83,74,183,.3);backdrop-filter:blur(4px);position:relative;overflow:hidden;}
+.rpg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(127,119,221,.4),transparent);}
 .game-sec{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--purple2);margin-bottom:14px;font-family:monospace;display:flex;align-items:center;gap:8px;}
 .game-sec::after{content:'';flex:1;height:1px;background:rgba(83,74,183,.25);}
-
-/* Character card */
-.char-layout{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;}
-.char-frame{
-  width:88px;height:88px;border-radius:10px;overflow:hidden;flex-shrink:0;
-  border:2px solid var(--purple);position:relative;
-  box-shadow:0 0 20px rgba(83,74,183,.4),inset 0 0 20px rgba(0,0,0,.3);
-}
-.char-frame img{width:100%;height:100%;object-fit:cover;}
-.char-frame-fb{display:none;width:100%;height:100%;background:#378ADD;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#fff;}
-.char-lv-pip{
-  position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
-  background:var(--purple);color:#fff;font-size:9px;font-weight:700;
-  padding:1px 8px;border-radius:4px 4px 0 0;letter-spacing:.06em;font-family:monospace;
-  white-space:nowrap;
-}
-.char-info{flex:1;min-width:180px;}
-.char-name-big{font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;}
-.char-class-tag{font-size:11px;color:var(--purple2);letter-spacing:.08em;font-family:monospace;margin-bottom:12px;}
-/* HP/MP bars */
-.stat-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.stat-lbl{font-size:10px;font-weight:700;font-family:monospace;letter-spacing:.06em;width:22px;flex-shrink:0;}
-.stat-lbl.hp{color:#e84040;}
-.stat-lbl.mp{color:#378ADD;}
-.stat-track{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;position:relative;}
-.stat-track-fill{height:100%;border-radius:4px;width:0;transition:width 1s ease;}
-.hp-fill{background:linear-gradient(to right,#a01010,#e84040);}
-.mp-fill{background:linear-gradient(to right,#1a3a8a,#378ADD);}
-.stat-val{font-size:10px;color:rgba(255,255,255,.45);font-family:monospace;width:58px;text-align:right;flex-shrink:0;}
-.char-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
-.char-badge-tag{font-size:10px;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1);padding:2px 7px;border-radius:4px;font-family:monospace;}
-
-/* RPG Player layout: EQUIP | DORAEMON | EQUIP */
 .rpg-player{display:grid;grid-template-columns:1fr 148px 1fr;gap:10px;align-items:center;margin-bottom:18px;}
 .equip-side{display:flex;flex-direction:column;gap:8px;}
-.eq-slot{
-  border-radius:8px;padding:10px 8px;
-  border:1px solid;position:relative;overflow:hidden;
-  cursor:default;transition:transform .18s,box-shadow .2s;
-  background:rgba(7,8,20,.7);
-}
+.eq-slot{border-radius:8px;padding:10px 8px;border:1px solid;position:relative;overflow:hidden;cursor:default;transition:transform .18s,box-shadow .2s;background:rgba(7,8,20,.7);}
 .eq-slot:hover{transform:scale(1.03);}
 .eq-slot-label{font-size:8px;font-family:monospace;letter-spacing:.1em;opacity:.45;margin-bottom:1px;}
 .eq-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;}
 .eq-lv{display:inline-block;font-size:8px;font-family:monospace;padding:1px 5px;border-radius:3px;color:#fff;margin-bottom:5px;}
 .eq-stats{list-style:none;}
 .eq-stats li{font-size:10px;font-family:monospace;color:rgba(255,255,255,.6);line-height:1.7;}
-/* Floating +N particle */
 .eq-particle{position:absolute;font-family:monospace;font-size:13px;font-weight:700;pointer-events:none;z-index:10;white-space:nowrap;text-shadow:0 0 8px currentColor;}
-/* Doraemon center */
 .dora-center{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .dora-name-plate{background:rgba(83,74,183,.35);border:1px solid rgba(83,74,183,.55);border-radius:6px;padding:4px 10px;font-family:monospace;font-size:11px;color:#fff;text-align:center;white-space:nowrap;}
 .dora-lv-plate{font-size:9px;font-family:monospace;color:var(--purple2);letter-spacing:.1em;}
-/* Doraemon float animation */
 @keyframes doraFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .dora-svg-wrap{animation:doraFloat 3.5s ease-in-out infinite;}
-@media(max-width:599px){
-  .rpg-player{grid-template-columns:1fr 120px 1fr;gap:6px;}
-}
-
-/* Achievements */
+.stat-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.stat-lbl{font-size:10px;font-weight:700;font-family:monospace;letter-spacing:.06em;width:22px;flex-shrink:0;}
+.stat-lbl.hp{color:#e84040;}
+.stat-lbl.mp{color:#378ADD;}
+.stat-track{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;}
+.stat-track-fill{height:100%;border-radius:4px;width:0;transition:width 1s ease;}
+.hp-fill{background:linear-gradient(to right,#a01010,#e84040);}
+.mp-fill{background:linear-gradient(to right,#1a3a8a,#378ADD);}
+.stat-val{font-size:10px;color:rgba(255,255,255,.45);font-family:monospace;width:58px;text-align:right;flex-shrink:0;}
+.char-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.char-badge-tag{font-size:10px;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1);padding:2px 7px;border-radius:4px;font-family:monospace;}
 .ach-grid{display:flex;flex-wrap:wrap;gap:8px;}
-.ach-badge{
-  display:flex;align-items:center;gap:5px;
-  padding:5px 12px;border-radius:5px;
-  background:rgba(239,159,39,.08);
-  border:1px solid rgba(239,159,39,.3);
-  font-size:12px;font-weight:600;color:var(--yellow);
-  transition:box-shadow .2s;font-family:monospace;
-}
+.ach-badge{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:5px;background:rgba(239,159,39,.08);border:1px solid rgba(239,159,39,.3);font-size:12px;font-weight:600;color:var(--yellow);transition:box-shadow .2s;font-family:monospace;}
 .ach-badge:hover{box-shadow:0 0 12px rgba(239,159,39,.25);}
-
-/* Timeline / Quest Log */
 .tl{border-left:2px solid rgba(83,74,183,.4);padding-left:20px;}
 .tl-n{position:relative;padding-bottom:18px;cursor:pointer;}
 .tl-dot{position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--purple);border:2px solid var(--purple2);transition:background .2s;}
@@ -232,24 +199,31 @@ body{font-family:'Noto Serif SC','PingFang SC','Microsoft YaHei',serif;overflow-
 .tl-n.open .tl-story{display:block}
 .tl-v{display:inline-block;font-size:10px;color:var(--purple2);margin-left:4px;transition:transform .18s;}
 .tl-n.open .tl-v{transform:rotate(180deg)}
-
-/* Vortex */
+.tl-n:focus-visible{outline:2px solid var(--blue2);outline-offset:2px;}
 #vortex{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;overflow:hidden;}
 #vortex.on{display:flex}
 #vortex-c{width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,#020308 0%,#07080f 50%,#07080f 100%);transform:scale(0) rotate(0deg);box-shadow:0 0 80px 40px #07080f;}
-
-/* WeChat modal / Toast / Close */
 #wc-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);}
 #wc-modal.on{display:flex}
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--purple);color:#fff;padding:9px 22px;border-radius:999px;font-size:13px;z-index:9999;transition:transform .3s;pointer-events:none;}
+#toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--purple);color:#fff;padding:9px 22px;border-radius:999px;font-size:13px;z-index:9999;transition:transform .3s;pointer-events:none;}
 #toast.show{transform:translateX(-50%) translateY(0)}
 #close-lv{position:fixed;top:52px;right:16px;z-index:210;width:44px;height:44px;border-radius:6px;background:rgba(83,74,183,.4);border:1px solid rgba(83,74,183,.6);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .18s;font-family:monospace;}
 #close-lv:hover{background:rgba(83,74,183,.7);}
 
+@media(max-width:900px){
+  .exhibit-grid{grid-template-columns:1fr;}
+  .exhibit:nth-child(2){margin-top:0;}
+  .exhibit:nth-child(3){grid-column:auto;}
+  .contact-wrap{grid-template-columns:1fr;}
+}
 @media(max-width:767px){
-  .hero-veil{background:linear-gradient(to bottom,rgba(6,12,22,.95) 0%,rgba(6,12,22,.85) 60%,rgba(6,12,22,.6) 100%);}
-  .flip-wrap{height:270px!important}
-  .char-layout{flex-direction:column;}
+  .hero-veil{background:linear-gradient(to bottom,rgba(6,12,22,.78) 0%,rgba(6,12,22,.6) 55%,rgba(6,12,22,.35) 100%);}
+  #hall-tag{display:none;}
+  .island{box-shadow:0 14px 40px rgba(0,0,0,.4);}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .exhibit{transition:none;opacity:1;transform:none;}
 }
 </style>
 </head>
@@ -260,15 +234,20 @@ body{font-family:'Noto Serif SC','PingFang SC','Microsoft YaHei',serif;overflow-
 const CONFIG = {
   birthYear: 2002,
   hero: { title:'意疏的AI口袋', subtitle:'让普通人也能通过AI\n把想法变成现实' },
-  character: { name:'意疏', job:'独立开发者', avatar:'assets/avatar.jpg' },
+  character: { name:'意疏', job:'独立开发者' },
 
   products: [
-    {name:'意疏的AI口袋',desc:'不丢失格式的公众号排版神器，从 Markdown 到微信，一步搞定',btn:'立即试用',link:'https://yishu5.github.io/GZHcomposing/',grad:'linear-gradient(135deg,#1a4a80,#2a70c0)',highlights:['零成本上手','格式零丢失','一键复制到公众号']},
-    {name:'NoiseFilter',desc:'从海量内容中提炼精华，你的个人内容策展助手',btn:'查看源码',link:'https://github.com/YiShu5/content-curation',grad:'linear-gradient(135deg,#3d3492,#534AB7)',highlights:['AI 自动降噪','多源聚合','开源可自部署']},
-    {name:'即将上线...',desc:'更多口袋道具正在打造中',btn:'敬请期待',link:'#',grad:'linear-gradient(135deg,#7a4a00,#c07820)',highlights:['神秘新品孵化中'],coming:true},
+    { name:'意疏的AI口袋', no:'No.1', medium:'Web 应用 · 2025', art:'night',
+      desc:'不丢失格式的公众号排版神器。从 Markdown 到微信，一步搞定——格式零丢失，一键复制即发布。',
+      btn:'参观展品', link:'https://yishu5.github.io/GZHcomposing/' },
+    { name:'NoiseFilter', no:'No.2', medium:'开源项目 · 2025', art:'iris',
+      desc:'从海量内容中提炼精华的个人策展助手。AI 自动降噪，多源聚合，开源可自部署。',
+      btn:'参观展品', link:'https://github.com/YiShu5/content-curation' },
+    { name:'未命名的下一件', no:'No.3', medium:'创作中 · 2026', art:'wip',
+      desc:'这幅画还停在草稿阶段。美术馆里最迷人的，往往是没画完的那一张。',
+      btn:'仍在创作中', link:'#', coming:true },
   ],
 
-  // ── 装备（技能映射为RPG装备）──
   equipment: [
     { icon:'⚔️', slot:'武器', name:'写代码',  lv:8, color:'#378ADD', stats:['ATK +80','CRIT +8%','BUILD ×3'] },
     { icon:'🛡️', slot:'防具', name:'做产品',  lv:6, color:'#534AB7', stats:['DEF +60','VISION +6','SHIP ×2'] },
@@ -322,93 +301,118 @@ const CONFIG = {
     {year:'2026.06',   event:'个人网站上线',              story:'把自己装进口袋，欢迎来到我的主页'},
   ],
 
-  contacts: { wechatQr:'assets/wechat-qr.png', email:'970342227@qq.com', github:'https://github.com/YiShu5', csdn:'https://blog.csdn.net/2302_79751907?type=blog', mpQr:'assets/qrcode.png' },
+  contacts: { email:'970342227@qq.com', github:'https://github.com/YiShu5', csdn:'https://blog.csdn.net/2302_79751907?type=blog' },
 };
 </script>
 
-<!-- NAVBAR -->
+<!-- WAYFINDING -->
 <nav id="navbar" role="navigation">
   <div style="max-width:1200px;margin:0 auto;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;">
     <span style="color:rgba(240,180,40,.9);font-size:15px;letter-spacing:.05em;font-weight:700;">意疏的AI口袋</span>
     <div id="nav-d" style="display:none;align-items:center;gap:28px;">
-      <a href="#hero"     class="nav-a">首页</a>
-      <a href="#products" class="nav-a">产品</a>
-      <a href="#books"    class="nav-a">书架</a>
-      <a href="#contact"  class="nav-a">联系</a>
+      <a href="#hero"     class="nav-a">序厅</a>
+      <a href="#products" class="nav-a">展品</a>
+      <a href="#books"    class="nav-a">书房</a>
+      <a href="#contact"  class="nav-a">留言台</a>
       <button onclick="openLife()" class="nav-a" style="background:none;border:none;cursor:pointer;padding:0;" aria-label="人生 Online">人生 Online</button>
     </div>
-    <button id="ham" onclick="toggleMob()" style="background:none;border:none;cursor:pointer;padding:6px;display:block;" aria-label="菜单">
-      <i data-lucide="menu" style="width:20px;height:20px;color:rgba(255,255,255,.7);"></i>
+    <button id="ham" onclick="toggleMob()" style="background:none;border:none;cursor:pointer;padding:6px;display:block;min-width:44px;min-height:44px;" aria-label="菜单">
+      <i data-lucide="menu" style="width:20px;height:20px;color:rgba(255,255,255,.7);margin:0 auto;"></i>
     </button>
   </div>
   <div id="mob-menu">
-    <a href="#hero"     class="nav-a" style="font-size:15px;" onclick="closeMob()">首页</a>
-    <a href="#products" class="nav-a" style="font-size:15px;" onclick="closeMob()">产品</a>
-    <a href="#books"    class="nav-a" style="font-size:15px;" onclick="closeMob()">书架</a>
-    <a href="#contact"  class="nav-a" style="font-size:15px;" onclick="closeMob()">联系</a>
-    <button onclick="closeMob();openLife()" class="nav-a" style="background:none;border:none;cursor:pointer;padding:0;font-size:15px;text-align:left;">人生 Online</button>
+    <a href="#hero"     class="nav-a" style="font-size:15px;" onclick="closeMob()">序厅</a>
+    <a href="#products" class="nav-a" style="font-size:15px;" onclick="closeMob()">展品</a>
+    <a href="#books"    class="nav-a" style="font-size:15px;" onclick="closeMob()">书房</a>
+    <a href="#contact"  class="nav-a" style="font-size:15px;" onclick="closeMob()">留言台</a>
+    <button onclick="closeMob();openLife()" class="nav-a" style="background:none;border:none;cursor:pointer;font-size:15px;text-align:left;">人生 Online</button>
   </div>
 </nav>
 
-<!-- HERO -->
+<div id="hall-tag" aria-hidden="true">展厅 <b id="hall-no">01</b><span id="hall-name">序厅</span></div>
+<button id="pause-bg" aria-pressed="false">暂停背景</button>
+
+<!-- 01 序厅 -->
 <section id="hero">
   <canvas id="vg-canvas"></canvas>
+  <canvas id="vg-live"></canvas>
   <div class="hero-veil"></div>
-  <div class="hero-txt">
-    <div class="hero-badge"><i data-lucide="pocket" style="width:12px;height:12px;"></i><span>意疏的AI口袋</span></div>
-    <h1 id="h-title"></h1>
-    <p  id="h-sub"></p>
-    <div id="h-btns"></div>
-  </div>
-  <div class="scroll-hint"><div class="scroll-line"></div><span>向下探索</span></div>
-</section>
-
-
-<!-- PRODUCTS -->
-<section id="products">
-  <div style="max-width:1200px;margin:0 auto;">
-    <p style="font-size:12px;letter-spacing:.14em;color:var(--yellow);margin-bottom:10px;font-family:sans-serif;">PRODUCTS</p>
-    <h2 class="sec-title" style="color:var(--brown);margin-bottom:48px;">口袋道具</h2>
-    <div id="pg" style="display:grid;gap:20px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));"></div>
-  </div>
-</section>
-
-
-<!-- BOOKS -->
-<section id="books">
-  <canvas id="books-canvas"></canvas>
-  <div id="books-veil"></div>
-  <div style="max-width:1000px;margin:0 auto;position:relative;z-index:1;">
-    <p style="font-size:12px;letter-spacing:.14em;color:var(--yellow);margin-bottom:10px;font-family:sans-serif;">BOOKSHELF</p>
-    <h2 class="sec-title" style="color:#fff;margin-bottom:8px;">我读过的书</h2>
-    <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:40px;font-family:sans-serif;">划线的地方，是真正改变了我的句子</p>
-    <div id="books-grid" style="display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));"></div>
-  </div>
-</section>
-
-
-
-<!-- CONTACT -->
-<section id="contact">
-  <div style="max-width:700px;margin:0 auto;text-align:center;">
-    <p style="font-size:12px;letter-spacing:.14em;color:var(--yellow);margin-bottom:10px;font-family:sans-serif;">CONTACT</p>
-    <h2 class="sec-title" style="color:var(--brown);margin-bottom:48px;">找到我</h2>
-    <div id="ci" style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:40px;"></div>
-    <div style="display:flex;justify-content:center;">
-      <div style="text-align:center;">
-        <div style="width:112px;height:112px;border-radius:10px;overflow:hidden;margin:0 auto 8px;background:#ddd;display:flex;align-items:center;justify-content:center;border:2px solid rgba(74,32,5,.15);">
-          <img src="assets/qrcode.png" alt="公众号二维码" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i data-lucide=&quot;qr-code&quot; style=&quot;width:48px;height:48px;color:var(--yellow);&quot;></i>';lucide.createIcons();">
-        </div>
-        <p style="font-size:12px;color:var(--gray);">公众号</p>
+  <div class="hero-inner">
+    <div class="island">
+      <div class="hall-eyebrow">序厅 · HALL 01 · A ONE-PERSON GALLERY</div>
+      <h1 id="h-title"></h1>
+      <p id="h-sub"></p>
+      <div id="h-btns">
+        <a href="#products" class="btn btn-y">进入展厅 ↓</a>
+        <button class="btn btn-p" onclick="openLife()" aria-label="人生 Online">互动装置 · 人生 Online</button>
       </div>
     </div>
   </div>
+  <div class="scroll-hint"><div class="scroll-line"></div><span>向下观展</span></div>
 </section>
+
+<!-- 02 展品 -->
+<section id="products" class="hall">
+  <div class="hall-head">
+    <div class="hall-eyebrow-l">第一展厅 · THE WORKS</div>
+    <h2 class="hall-title">展品</h2>
+    <p class="hall-note">每一件展品都不是效果图，是能打开、能使用的真东西。画芯由程序逐笔生成，和这座美术馆的墙一样。</p>
+  </div>
+  <div class="exhibit-grid" id="pg"></div>
+</section>
+
+<!-- 03 书房 -->
+<section id="books" class="hall">
+  <canvas id="books-canvas"></canvas>
+  <div id="books-veil"></div>
+  <div style="position:relative;z-index:1;">
+    <div class="hall-head" style="max-width:1000px;">
+      <div class="hall-eyebrow-l">书房 · READING ROOM</div>
+      <h2 class="hall-title">我读过的书</h2>
+      <p class="hall-note">划线的地方，是真正改变了我的句子。</p>
+    </div>
+    <div class="book-list" id="books-grid"></div>
+  </div>
+</section>
+
+<!-- 04 互动装置 -->
+<section id="install" class="hall">
+  <div class="hall-head" style="text-align:center;max-width:640px;">
+    <div class="hall-eyebrow-l">特别互动装置 · INTERACTIVE</div>
+    <h2 class="hall-title">人生 Online</h2>
+    <p class="hall-note">本馆唯一可以上手玩的展品——技能做成装备，经历写成任务日志，等级按真实年龄实时结算。</p>
+    <button class="ticket" onclick="openLife()">领取导览手册 · 进入装置 <small>PLAYER.SAVE</small></button>
+  </div>
+</section>
+
+<!-- 05 留言台 -->
+<section id="contact" class="hall">
+  <div class="hall-head" style="max-width:1000px;">
+    <div class="hall-eyebrow-l">出口 · GUESTBOOK</div>
+    <h2 class="hall-title">留言台</h2>
+    <p class="hall-note">如果你也想做点什么，或者只是想聊聊——展品的作者通常就在馆里。</p>
+  </div>
+  <div class="contact-wrap">
+    <div id="ci"></div>
+    <div class="qr-block">
+      <div class="qr-frame"><div class="qr-mat">
+        <div class="inner">
+          <img src="assets/qrcode.png" alt="公众号二维码" onerror="this.parentElement.innerHTML='<i data-lucide=&quot;qr-code&quot; style=&quot;width:44px;height:44px;color:#CBAC7A;&quot;></i>';lucide.createIcons();">
+        </div>
+      </div></div>
+      <p>公众号 · 不定期更新</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 意疏的AI口袋 · 一个人的画廊</span>
+  <span>展品持续增加中 · MADE WITH 🌻</span>
+</footer>
 
 <!-- ════ LIFE ONLINE — RPG GAME SCREEN ════ -->
 <div id="life-ov" role="dialog" aria-modal="true" aria-label="人生 Online">
 
-  <!-- HUD top bar -->
   <div class="game-hud">
     <span><span class="hud-dot"></span>YISHU · RPG</span>
     <span style="font-size:10px;opacity:.5;">SAVE FILE #001 · AUTO SAVED</span>
@@ -418,78 +422,50 @@ const CONFIG = {
   <div style="max-width:700px;margin:0 auto;padding:16px 16px 60px;position:relative;z-index:1;">
     <button id="close-lv" onclick="closeLife()" aria-label="关闭">[ ESC ]</button>
 
-    <!-- Character + Equipment combined -->
     <div id="rv-char" class="rpg">
       <div class="game-sec">⚔ PLAYER · EQUIPMENT</div>
-
-      <!-- Three-column: left equip | Doraemon | right equip -->
       <div class="rpg-player">
-
-        <!-- Left equipment (rendered by JS) -->
         <div id="eq-left" class="equip-side"></div>
-
-        <!-- Doraemon center -->
         <div class="dora-center">
           <div class="dora-svg-wrap">
             <svg viewBox="0 0 200 262" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:148px;display:block;">
-              <!-- Shadow -->
               <ellipse cx="100" cy="256" rx="46" ry="7" fill="rgba(0,0,0,0.18)"/>
-              <!-- ── LEFT ARM ── -->
               <path d="M54,188 Q30,198 20,222" stroke="#1BA0E1" stroke-width="28" stroke-linecap="round" fill="none"/>
               <circle cx="18" cy="226" r="16" fill="#1BA0E1"/>
-              <!-- SWORD in left hand -->
               <rect x="11" y="192" width="5" height="34" rx="2.5" fill="#C8D8E8" stroke="#7A9AAA" stroke-width="0.8"/>
               <rect x="4" y="202" width="19" height="5" rx="2.5" fill="#DAA520" stroke="#AA8010" stroke-width="0.8"/>
               <rect x="12" y="207" width="3.5" height="14" rx="1.5" fill="#7B3F00"/>
-              <!-- ── RIGHT ARM ── -->
               <path d="M146,188 Q170,198 180,222" stroke="#1BA0E1" stroke-width="28" stroke-linecap="round" fill="none"/>
               <circle cx="182" cy="226" r="16" fill="#1BA0E1"/>
-              <!-- BOOK in right hand -->
               <rect x="172" y="196" width="22" height="28" rx="3" fill="#534AB7" stroke="#7F77DD" stroke-width="1.5"/>
               <rect x="174" y="198" width="8" height="24" rx="1.5" fill="rgba(255,255,255,.12)"/>
               <line x1="183" y1="196" x2="183" y2="224" stroke="rgba(255,255,255,.2)" stroke-width="1"/>
-              <!-- ── BODY ── -->
               <ellipse cx="100" cy="206" rx="50" ry="44" fill="#1BA0E1"/>
-              <!-- White belly -->
               <ellipse cx="100" cy="215" rx="35" ry="32" fill="#FAFAFA"/>
-              <!-- 4D Pocket -->
               <ellipse cx="100" cy="226" rx="22" ry="9" fill="none" stroke="#CCCCCC" stroke-width="1.5"/>
               <path d="M78,226 Q100,238 122,226" fill="rgba(0,0,0,0.06)" stroke="#CCC" stroke-width="0.8"/>
-              <!-- ── COLLAR ── -->
               <rect x="64" y="155" width="72" height="13" rx="6.5" fill="#E8192C"/>
-              <!-- Bell -->
               <circle cx="100" cy="162" r="9" fill="#F5C842" stroke="#C8960C" stroke-width="1.2"/>
               <circle cx="100" cy="165" r="3" fill="#8B6914"/>
               <line x1="93" y1="162" x2="107" y2="162" stroke="#C8960C" stroke-width="0.8"/>
-              <!-- ── HEAD ── -->
               <circle cx="100" cy="88" r="68" fill="#1BA0E1"/>
-              <!-- Face white -->
               <ellipse cx="100" cy="98" rx="52" ry="50" fill="#FAFAFA"/>
-              <!-- Eyes whites -->
               <circle cx="77" cy="79" r="16" fill="white"/>
               <circle cx="123" cy="79" r="16" fill="white"/>
-              <!-- Pupils -->
               <circle cx="80" cy="81" r="9" fill="#111"/>
               <circle cx="126" cy="81" r="9" fill="#111"/>
-              <!-- Eye shine -->
               <circle cx="83" cy="77" r="3.5" fill="white"/>
               <circle cx="129" cy="77" r="3.5" fill="white"/>
-              <!-- Nose -->
               <circle cx="100" cy="100" r="9" fill="#E8192C"/>
               <circle cx="97" cy="97" r="3" fill="rgba(255,255,255,.45)"/>
-              <!-- Mouth line -->
               <line x1="100" y1="109" x2="100" y2="122" stroke="#222" stroke-width="2" stroke-linecap="round"/>
-              <!-- Smile -->
               <path d="M72,120 Q100,144 128,120" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
-              <!-- Whiskers left -->
               <line x1="42" y1="101" x2="88" y2="105" stroke="#444" stroke-width="1.4"/>
               <line x1="40" y1="111" x2="88" y2="111" stroke="#444" stroke-width="1.4"/>
               <line x1="42" y1="121" x2="88" y2="117" stroke="#444" stroke-width="1.4"/>
-              <!-- Whiskers right -->
               <line x1="112" y1="105" x2="158" y2="101" stroke="#444" stroke-width="1.4"/>
               <line x1="112" y1="111" x2="160" y2="111" stroke="#444" stroke-width="1.4"/>
               <line x1="112" y1="117" x2="158" y2="121" stroke="#444" stroke-width="1.4"/>
-              <!-- ── FEET ── -->
               <ellipse cx="78" cy="252" rx="22" ry="10" fill="#1BA0E1"/>
               <ellipse cx="122" cy="252" rx="22" ry="10" fill="#1BA0E1"/>
             </svg>
@@ -498,12 +474,9 @@ const CONFIG = {
           <div class="dora-lv-plate" id="cl"></div>
           <div style="font-size:9px;font-family:monospace;color:rgba(255,255,255,.35);" id="cj"></div>
         </div>
-
-        <!-- Right equipment (rendered by JS) -->
         <div id="eq-right" class="equip-side"></div>
       </div>
 
-      <!-- HP / MP bars below Doraemon -->
       <div style="display:flex;flex-direction:column;gap:7px;">
         <div class="stat-row">
           <span class="stat-lbl hp">HP</span>
@@ -523,13 +496,11 @@ const CONFIG = {
       </div>
     </div>
 
-    <!-- Achievements -->
     <div id="rv-ac" class="rpg">
       <div class="game-sec">🏆 ACHIEVEMENTS</div>
       <div id="acl" class="ach-grid"></div>
     </div>
 
-    <!-- Quest Log -->
     <div id="rv-tl" class="rpg">
       <div class="game-sec">📜 QUEST LOG</div>
       <div id="tll" class="tl"></div>
@@ -537,17 +508,18 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- Vortex -->
 <div id="vortex"><div id="vortex-c"></div></div>
 
 <!-- WeChat modal -->
 <div id="wc-modal" onclick="this.classList.remove('on')" role="dialog" aria-label="微信二维码">
-  <div style="background:#fff;border-radius:18px;padding:28px;text-align:center;" onclick="event.stopPropagation()">
-    <p style="font-weight:700;color:#0C447C;margin-bottom:12px;font-size:15px;">扫码添加微信</p>
-    <div style="width:160px;height:160px;border-radius:10px;overflow:hidden;margin:0 auto 16px;background:#eee;display:flex;align-items:center;justify-content:center;">
-      <img src="assets/wechat-qr.png" alt="微信二维码" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i data-lucide=&quot;message-circle&quot; style=&quot;width:60px;height:60px;color:#07C160;&quot;></i>';lucide.createIcons();">
-    </div>
-    <button onclick="document.getElementById('wc-modal').classList.remove('on')" style="padding:9px 24px;background:#378ADD;color:#fff;border:none;border-radius:999px;font-size:13px;cursor:pointer;">关闭</button>
+  <div style="background:#F4EDDE;border-radius:4px;padding:28px;text-align:center;" onclick="event.stopPropagation()">
+    <p style="font-weight:700;color:#2a2114;margin-bottom:14px;font-size:15px;">扫码添加微信</p>
+    <div class="qr-frame" style="display:inline-block;"><div class="qr-mat">
+      <div class="inner" style="width:150px;height:150px;">
+        <img src="assets/wechat-qr.png" alt="微信二维码" onerror="this.parentElement.innerHTML='<i data-lucide=&quot;message-circle&quot; style=&quot;width:56px;height:56px;color:#AF6C5F;&quot;></i>';lucide.createIcons();">
+      </div>
+    </div></div>
+    <div><button onclick="document.getElementById('wc-modal').classList.remove('on')" style="margin-top:16px;padding:10px 26px;background:#141c2e;color:#F4EDDE;border:none;border-radius:3px;font-size:13px;cursor:pointer;min-height:40px;">收好名片</button></div>
   </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -567,13 +539,26 @@ function makeRng(seed){
     pick(arr){return arr[Math.floor(this.n(0,arr.length))];}
   };
 }
+function brushMaker(cx){
+  return function bs(x1,y1,cpx,cpy,x2,y2,col,w,a=.7){
+    cx.save();cx.globalAlpha=a;cx.strokeStyle=col;cx.lineWidth=w;cx.lineCap='round';cx.lineJoin='round';
+    cx.beginPath();cx.moveTo(x1,y1);cx.quadraticCurveTo(cpx,cpy,x2,y2);cx.stroke();cx.restore();
+  };
+}
+function fitCanvas(cv){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const w=cv.offsetWidth||window.innerWidth, h=cv.offsetHeight||window.innerHeight;
+  cv.width=w*dpr; cv.height=h*dpr;
+  cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+  return [w,h];
+}
 
-// ── VAN GOGH CANVAS ──────────────────────
+// ── 序厅：梵高底画（静态层）──
 (function(){
   const cv=document.getElementById('vg-canvas');
   const cx=cv.getContext('2d');
   const rng=makeRng(12345);
-  function bs(x1,y1,cpx,cpy,x2,y2,col,w,a=.7){cx.save();cx.globalAlpha=a;cx.strokeStyle=col;cx.lineWidth=w;cx.lineCap='round';cx.lineJoin='round';cx.beginPath();cx.moveTo(x1,y1);cx.quadraticCurveTo(cpx,cpy,x2,y2);cx.stroke();cx.restore();}
+  const bs=brushMaker(cx);
   function draw(W,H){
     cx.clearRect(0,0,W,H);cx.fillStyle='#06101e';cx.fillRect(0,0,W,H);
     const sky=['#0d2540','#152e52','#1a3a6b','#0f2244','#1e3d6e','#173358','#0a1e38','#0c2448'];
@@ -591,106 +576,209 @@ function makeRng(seed){
     });
     const g=cx.createRadialGradient(W*.76,H*.55,0,W*.76,H*.55,W*.38);g.addColorStop(0,'rgba(240,180,40,.11)');g.addColorStop(.4,'rgba(200,130,20,.05)');g.addColorStop(1,'transparent');cx.fillStyle=g;cx.fillRect(0,0,W,H);
   }
-  function resize(){
-    const dpr=Math.min(window.devicePixelRatio||1,2);
-    const w=window.innerWidth,h=window.innerHeight;
-    cv.width=w*dpr;cv.height=h*dpr;
-    cx.setTransform(dpr,0,0,dpr,0,0);
-    draw(w,h);
-  }
-  resize();let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(resize,200);});
+  function resize(){const [w,h]=fitCanvas(cv);draw(w,h);}
+  resize();let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(resize,220);});
 })();
 
-// ── NAVBAR ────────────────────────────────
+// ── 序厅：活的光（动态层）──
+let bgAlive=false;
+(function(){
+  const cv=document.getElementById('vg-live');
+  const cx=cv.getContext('2d');
+  const rng=makeRng(777);
+  let W=0,H=0,raf=null,t0=performance.now();
+  const motes=Array.from({length:56},()=>({x:rng.n(0,1),y:rng.n(.1,1),r:rng.n(.7,2.3),vx:rng.n(.006,.02),ph:rng.n(0,6.28),gold:rng.n(0,1)>.45}));
+  function resize(){[W,H]=fitCanvas(cv);}
+  resize();window.addEventListener('resize',()=>{clearTimeout(window._lrt);window._lrt=setTimeout(resize,220);});
+  function frame(now){
+    if(!bgAlive){raf=null;return;}
+    const t=(now-t0)/1000;
+    cx.clearRect(0,0,W,H);
+    // 呼吸光：在向日葵花田上缓缓游走
+    const gx=W*(.78+Math.sin(t*.11)*.035), gy=H*(.58+Math.cos(t*.09)*.05);
+    const g=cx.createRadialGradient(gx,gy,0,gx,gy,W*.3);
+    g.addColorStop(0,'rgba(255,214,100,.10)');g.addColorStop(1,'rgba(255,214,100,0)');
+    cx.fillStyle=g;cx.fillRect(0,0,W,H);
+    // 花粉与星尘
+    motes.forEach(m=>{
+      const x=((m.x+t*m.vx)%1)*W;
+      const y=m.y*H+Math.sin(t*.7+m.ph)*10;
+      const a=.12+.28*(0.5+0.5*Math.sin(t*1.1+m.ph));
+      cx.beginPath();cx.arc(x,y,m.r,0,6.283);
+      cx.fillStyle=m.gold?`rgba(245,200,70,${a})`:`rgba(210,228,255,${a*.8})`;
+      cx.fill();
+    });
+    raf=requestAnimationFrame(frame);
+  }
+  const btn=document.getElementById('pause-bg');
+  function setAlive(on){
+    bgAlive=on&&!noMo()&&document.visibilityState==='visible';
+    btn.textContent=bgAlive?'暂停背景':'播放背景';
+    btn.setAttribute('aria-pressed',String(!bgAlive));
+    if(bgAlive&&!raf){t0=performance.now()-16000;raf=requestAnimationFrame(frame);}
+  }
+  btn.addEventListener('click',()=>setAlive(!bgAlive));
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){bgAlive=false;}else if(btn.textContent==='暂停背景'){setAlive(true);}});
+  setAlive(true);
+})();
+
+// ── 导览角标 ──
+(function(){
+  const halls=[['hero','01','序厅'],['products','02','展品'],['books','03','书房'],['install','04','互动装置'],['contact','05','留言台']];
+  const no=document.getElementById('hall-no'),nm=document.getElementById('hall-name');
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){const h=halls.find(x=>x[0]===e.target.id);if(h){no.textContent=h[1];nm.textContent=h[2];}}});
+  },{rootMargin:'-42% 0px -42% 0px'});
+  halls.forEach(h=>{const el=document.getElementById(h[0]);if(el)io.observe(el);});
+})();
+
+// ── NAVBAR ──
 (function(){const d=document.getElementById('nav-d'),h=document.getElementById('ham');function lay(){if(window.innerWidth>=768){d.style.display='flex';h.style.display='none';}else{d.style.display='none';h.style.display='block';}}lay();window.addEventListener('resize',lay);})();
 function toggleMob(){document.getElementById('mob-menu').classList.toggle('open');}
 function closeMob(){document.getElementById('mob-menu').classList.remove('open');}
 
-// ── HERO ──────────────────────────────────
+// ── HERO 文案与入场 ──
 document.getElementById('h-title').textContent=CONFIG.hero.title;
-document.getElementById('h-sub').innerHTML=CONFIG.hero.subtitle.replace('\n','<br>');
-(function(){
-  const c=document.getElementById('h-btns');
-  const first=document.createElement('a');first.href='#products';first.className='btn btn-y';first.textContent='探索道具';c.appendChild(first);
-  [{label:'书架',href:'#books',cls:'btn btn-g'},{label:'人生 Online',href:null,cls:'btn btn-p',fn:'openLife()'}].forEach(b=>{
-    let el;if(b.href){el=document.createElement('a');el.href=b.href;}else{el=document.createElement('button');el.setAttribute('onclick',b.fn);}
-    el.className=b.cls;el.textContent=b.label;el.setAttribute('aria-label',b.label);c.appendChild(el);
-  });
-})();
+document.getElementById('h-sub').innerHTML='让普通人也能通过AI<br>把想法变成现实。<br><em>展品不多，件件亲手打磨。</em>';
 window.addEventListener('load',()=>{
-  gsap.to('#h-title',{opacity:1,y:0,duration:1.4,ease:'power2.out',delay:.2});
-  gsap.to('#h-sub',  {opacity:1,y:0,duration:1.1,ease:'power2.out',delay:.7});
-  gsap.to('#h-btns', {opacity:1,    duration:.9, ease:'power2.out',delay:1.1});
+  if(noMo()){gsap.set(['.island','.scroll-hint'],{opacity:1});}
+  else{
+    gsap.from('.island',{opacity:0,y:44,duration:1.3,ease:'power3.out',delay:.25});
+    gsap.from('.scroll-hint',{opacity:0,duration:1,delay:1.2});
+  }
   lucide.createIcons();
 });
+</script>
+<script>
+// ── 展品画芯：为每件作品生成一幅迷你油画 ──
+function genPainting(cv,type){
+  const [W,H]=fitCanvas(cv);
+  const cx=cv.getContext('2d');
+  const seed=type==='night'?777:type==='iris'?888:999;
+  const rng=makeRng(seed);
+  const bs=brushMaker(cx);
+  cx.clearRect(0,0,W,H);
+  if(type==='night'){
+    // 《意疏的AI口袋》· 夜空流星：工具是黑夜里的光
+    cx.fillStyle='#0a1830';cx.fillRect(0,0,W,H);
+    const sky=['#12294d','#1a3a6b','#0f2244','#173358','#1e3d6e'];
+    const swX=W*.68,swY=H*.34;
+    for(let i=0;i<950;i++){const x=rng.n(0,W),y=rng.n(0,H*.82);const a=Math.atan2(y-swY,x-swX)+1.35+rng.n(-.2,.2);const l=rng.n(10,34);bs(x,y,x+Math.cos(a)*l*.5+rng.n(-4,4),y+Math.sin(a)*l*.5+rng.n(-4,4),x+Math.cos(a)*l,y+Math.sin(a)*l,rng.pick(sky),rng.n(2,6),rng.n(.3,.65));}
+    // 星
+    for(let i=0;i<26;i++){const x=rng.n(0,W),y=rng.n(0,H*.6),r=rng.n(1.5,4);
+      for(let j=0;j<8;j++){const a=j/8*6.283;bs(x+Math.cos(a)*r,y+Math.sin(a)*r,x+Math.cos(a)*r*2.2,y+Math.sin(a)*r*2.2,x+Math.cos(a)*r*3,y+Math.sin(a)*r*3,'#e8c040',1.4,rng.n(.4,.8));}
+      cx.fillStyle='rgba(255,230,140,.9)';cx.beginPath();cx.arc(x,y,r*.55,0,6.283);cx.fill();}
+    // 流星
+    [{x:.24,y:.2,l:.3},{x:.62,y:.12,l:.22}].forEach(s=>{
+      const x1=W*s.x,y1=H*s.y,x2=x1+W*s.l,y2=y1+H*s.l*.28;
+      const gr=cx.createLinearGradient(x1,y1,x2,y2);
+      gr.addColorStop(0,'rgba(255,236,160,0)');gr.addColorStop(.75,'rgba(255,236,160,.85)');gr.addColorStop(1,'rgba(255,255,230,.95)');
+      cx.strokeStyle=gr;cx.lineWidth=2.2;cx.lineCap='round';
+      cx.beginPath();cx.moveTo(x1,y1);cx.quadraticCurveTo((x1+x2)/2,(y1+y2)/2-6,x2,y2);cx.stroke();
+    });
+    // 金色地平线
+    const H0=H*.8;
+    const O=['#cc7a1a','#e09a2a','#c89010','#daa520'],G=['#3a5a20','#2d4a1a'];
+    for(let i=0;i<420;i++){const x=rng.n(0,W),y=rng.n(H0,H);const l=rng.n(6,20);bs(x,y,x+l*.4,y-rng.n(2,6),x+l,y-rng.n(3,9),rng.pick(y<H0+H*.08?O:[...O,...G]),rng.n(2,5),rng.n(.4,.8));}
+  } else if(type==='iris'){
+    // 《NoiseFilter》· 鸢尾花田：噪声中提炼的那几朵
+    cx.fillStyle='#241d3f';cx.fillRect(0,0,W,H);
+    const bg=['#2c2450','#3a2f66','#241d45','#312a58'];
+    for(let i=0;i<700;i++){const x=rng.n(0,W),y=rng.n(0,H);const a=rng.n(-.4,.4)-.5;const l=rng.n(10,30);bs(x,y,x+l*.5,y+rng.n(-4,4),x+l,y+rng.n(-3,3),rng.pick(bg),rng.n(2,6),rng.n(.3,.6));}
+    const V=['#7F77DD','#534AB7','#9a8ef0','#4636a0'],W_=['#e8e4f8'],G=['#2d5a2d','#3d6a2d'];
+    // 草叶
+    for(let i=0;i<200;i++){const x=rng.n(0,W),y=rng.n(H*.5,H);const l=rng.n(8,26);bs(x,y,x+rng.n(-6,6),y-l*.6,x+rng.n(-10,10),y-l,rng.pick(G),rng.n(1.5,4),rng.n(.4,.75));}
+    // 鸢尾：少数被“提炼”出来的花
+    [{fx:.2,fy:.42,s:22},{fx:.46,fy:.55,s:28},{fx:.72,fy:.38,s:20},{fx:.88,fy:.58,s:16},{fx:.58,fy:.3,s:13}].forEach(f=>{
+      const x=W*f.fx,y=H*f.fy,s=f.s;
+      for(let p=0;p<6;p++){const a=p/6*6.283+rng.n(-.15,.15);
+        bs(x,y,x+Math.cos(a)*s*.7+rng.n(-3,3),y+Math.sin(a)*s*.7+rng.n(-3,3),x+Math.cos(a)*s,y+Math.sin(a)*s,rng.pick(V),s*.34,rng.n(.75,.95));}
+      bs(x,y,x+rng.n(-2,2),y+rng.n(-2,2),x,y,rng.pick(W_),s*.3,.9);
+      cx.fillStyle='#f5e6a0';cx.beginPath();cx.arc(x,y,s*.13,0,6.283);cx.fill();
+    });
+  } else {
+    // 《未命名的下一件》· 未完成的手稿
+    cx.fillStyle='#E8DCC0';cx.fillRect(0,0,W,H);
+    // 铅笔稿格线
+    cx.strokeStyle='rgba(90,80,60,.18)';cx.lineWidth=1;
+    for(let i=1;i<6;i++){cx.beginPath();cx.moveTo(W*i/6,0);cx.lineTo(W*i/6,H);cx.stroke();}
+    for(let i=1;i<4;i++){cx.beginPath();cx.moveTo(0,H*i/4);cx.lineTo(W,H*i/4);cx.stroke();}
+    // 构图草稿圆
+    cx.strokeStyle='rgba(90,80,60,.3)';cx.setLineDash([4,4]);
+    cx.beginPath();cx.arc(W*.62,H*.5,H*.3,0,6.283);cx.stroke();
+    cx.setLineDash([]);
+    // 只有左上角开始上颜料
+    const O=['#cc7a1a','#daa520','#b8552a','#c89010'];
+    for(let i=0;i<230;i++){const x=rng.n(0,W*.5),y=rng.n(0,H*.55);if(x/W+y/H>rng.n(.5,1.1))continue;const a=rng.n(0,6.28);const l=rng.n(6,18);bs(x,y,x+Math.cos(a)*l*.5,y+Math.sin(a)*l*.5,x+Math.cos(a)*l,y+Math.sin(a)*l,rng.pick(O),rng.n(2,5),rng.n(.5,.85));}
+    // 落款问号
+    cx.fillStyle='rgba(90,80,60,.4)';cx.font='700 20px monospace';cx.fillText('?',W*.62-5,H*.52);
+  }
+}
 
-// ── PRODUCTS ──────────────────────────────
+// ── 渲染展品 ──
 (function(){
   const g=document.getElementById('pg');
   CONFIG.products.forEach(p=>{
-    const hl=p.highlights.map(h=>`<li style="display:flex;align-items:flex-start;gap:7px;margin-bottom:9px;"><span style="color:#85B7EB;flex-shrink:0;">✓</span><span style="font-size:13px;color:rgba(255,255,255,.88);line-height:1.5;">${h}</span></li>`).join('');
-    const card=document.createElement('div');card.className='p-card';
-    card.innerHTML=`<div class="flip-wrap" style="height:300px;"><div class="flip-inner">
-      <div class="flip-f" style="background:#fff;">
-        <div style="height:100px;background:${p.grad};"></div>
-        <div style="padding:16px 18px 10px;"><h3 style="font-size:15px;font-weight:700;color:var(--brown);margin-bottom:7px;">${p.name}</h3><p style="font-size:13px;color:var(--gray);line-height:1.65;">${p.desc}</p></div>
-        <div style="padding:0 18px 14px;text-align:right;"><span style="font-size:12px;color:var(--blue2);opacity:.7;">点击查看亮点 ›</span></div>
-      </div>
-      <div class="flip-b" style="background:linear-gradient(160deg,#0a1e40,#0C447C);">
-        <div style="padding:20px;height:100%;display:flex;flex-direction:column;justify-content:space-between;">
-          <div><h3 style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;">${p.name}</h3><ul style="list-style:none;">${hl}</ul></div>
-          <a href="${p.link}" ${p.coming?'':'target="_blank" rel="noopener noreferrer"'} style="display:block;text-align:center;padding:10px;background:var(--yellow);color:#1a0800;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;" onmouseover="this.style.background='var(--red)';this.style.color='#fff'" onmouseout="this.style.background='var(--yellow)';this.style.color='#1a0800'" onclick="event.stopPropagation()">${p.btn}</a>
-        </div>
-      </div>
-    </div></div>`;
-    const fw=card.querySelector('.flip-wrap');
-    card.addEventListener('click',()=>fw.classList.toggle('flipped'));
-    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fw.classList.toggle('flipped');}});
-    card.setAttribute('tabindex','0');card.setAttribute('role','button');card.setAttribute('aria-label',p.name);
-    g.appendChild(card);
+    const fig=document.createElement('figure');fig.className='exhibit';fig.style.margin='0';
+    const ratio=p.art==='wip'?'4 / 3':'16 / 9';
+    fig.innerHTML=`
+      <div class="frame"><div class="frame-mat"><canvas style="aspect-ratio:${ratio};" aria-label="${p.name} · 生成油画"></canvas></div></div>
+      <figcaption class="mlabel">
+        <div class="row1"><h3>${p.name}</h3><span class="no">展品 ${p.no}</span></div>
+        <div class="medium">${p.medium} · 布面程序油画</div>
+        <p>${p.desc}</p>
+        ${p.coming
+          ? `<button class="go soon" onclick="toast('这件展品还在创作中，${p.medium.split('·')[1].trim()} 开展')">${p.btn}</button>`
+          : `<a class="go" href="${p.link}" target="_blank" rel="noopener noreferrer">${p.btn} →</a>`}
+      </figcaption>`;
+    g.appendChild(fig);
+    genPainting(fig.querySelector('canvas'),p.art);
   });
+  // 入场
+  if('IntersectionObserver' in window && !noMo()){
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('seen');io.unobserve(e.target);}});},{threshold:.18});
+    document.querySelectorAll('.exhibit').forEach(el=>io.observe(el));
+  } else {
+    document.querySelectorAll('.exhibit').forEach(el=>el.classList.add('seen'));
+  }
 })();
 
-// ── BOOKS SECTION ─────────────────────────
+// ── 书房 ──
 (function(){
   const g=document.getElementById('books-grid');
   CONFIG.books.forEach(b=>{
-    const myBadge = b.myHighlight ? `<span style="font-size:10px;color:var(--yellow);font-family:monospace;margin-left:6px;">✏️ 我的划线</span>` : '';
-    const coverHtml = b.cover
-      ? `<img src="${b.cover}" alt="${b.title}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" onerror="this.style.display='none';this.nextSibling.style.display='flex';">
-         <span style="display:none;font-size:26px;width:100%;height:100%;align-items:center;justify-content:center;">${b.emoji}</span>`
-      : `<span style="font-size:26px;">${b.emoji}</span>`;
-    const card=document.createElement('div');card.className='book-card';
+    const myBadge=b.myHighlight?`<span style="font-size:10px;color:var(--yellow);font-family:monospace;margin-left:6px;">✏️ 我的划线</span>`:'';
+    const coverHtml=b.cover
+      ? `<img src="${b.cover}" alt="${b.title}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='block';"><span style="display:none;font-size:24px;">${b.emoji}</span>`
+      : `<span style="font-size:24px;">${b.emoji}</span>`;
+    const card=document.createElement('div');card.className='book-item';
     card.innerHTML=`
-      <div class="book-cover" style="background:linear-gradient(135deg,#1a2a4a,#0a1a2a);display:flex;align-items:center;justify-content:center;">${coverHtml}</div>
+      <div class="book-cover">${coverHtml}</div>
       <div style="flex:1;min-width:0;">
         <h3 class="book-title">${b.title}${myBadge}</h3>
-        <p style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:7px;font-family:sans-serif;letter-spacing:.03em;">${b.author}</p>
+        <p style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:6px;font-family:sans-serif;letter-spacing:.03em;">${b.author}</p>
         <div class="book-highlight">"${b.highlight}"</div>
         <p class="book-comment">${b.comment}</p>
         <a href="${b.weread}" target="_blank" rel="noopener noreferrer" class="weread-btn">
-          <i data-lucide="book-open" style="width:11px;height:11px;"></i>
-          在微信读书看
+          <i data-lucide="book-open" style="width:11px;height:11px;"></i>在微信读书看
         </a>
       </div>`;
     g.appendChild(card);
   });
-  lucide.createIcons();
 
-  // ── 书架区 Van Gogh 背景（不同种子，花朵偏左下）──
+  // 书房星夜（懒绘制 + DPR）
   (function(){
     const cv=document.getElementById('books-canvas');
     if(!cv) return;
     const cx=cv.getContext('2d');
-    const rng=makeRng(54321); // 不同种子
-    function bs(x1,y1,cpx,cpy,x2,y2,col,w,a=.7){cx.save();cx.globalAlpha=a;cx.strokeStyle=col;cx.lineWidth=w;cx.lineCap='round';cx.lineJoin='round';cx.beginPath();cx.moveTo(x1,y1);cx.quadraticCurveTo(cpx,cpy,x2,y2);cx.stroke();cx.restore();}
+    const rng=makeRng(54321);
+    const bs=brushMaker(cx);
     function draw(W,H){
       cx.clearRect(0,0,W,H);cx.fillStyle='#050e1a';cx.fillRect(0,0,W,H);
       const sky=['#0b2038','#122840','#183055','#0a1c30','#162a4a','#0e2238'];
       const swX=W*.3,swY=H*.4;
       for(let i=0;i<1600;i++){const x=rng.n(0,W),y=rng.n(0,H);const angle=Math.atan2(y-swY,x-swX)+1.4+rng.n(-.25,.25);const len=rng.n(16,55);bs(x,y,x+Math.cos(angle)*len*.5+rng.n(-5,5),y+Math.sin(angle)*len*.5+rng.n(-5,5),x+Math.cos(angle)*len,y+Math.sin(angle)*len,rng.pick(sky),rng.n(3,9),rng.n(.25,.6));}
       const Y=['#f0b429','#daa520','#e8c040','#ffd700'],O=['#cc6600','#e07b22'],G=['#2d6a2d','#4a7a2d','#1d4a1d'],B=['#1a0800','#2d0e00','#3d1c02'];
-      // 少量花朵散布在画面
       [{fx:.12,fy:.7,sz:42},{fx:.28,fy:.85,sz:55},{fx:.82,fy:.6,sz:48},{fx:.95,fy:.8,sz:36}].forEach(f=>{
         const cx2=W*f.fx,cy2=H*f.fy,sz=f.sz*(isMob()?.6:1);
         for(let i=0;i<8;i++){const off=rng.n(-4,4);bs(cx2+off,H*1.02,cx2+rng.n(-14,14),(H*1.02+cy2)/2,cx2+off*.3,cy2+sz*.8,rng.pick(G),rng.n(4,10),rng.n(.55,.8));}
@@ -699,55 +787,44 @@ window.addEventListener('load',()=>{
       });
     }
     let drawn=false;
-    function resize(){
-      const dpr=Math.min(window.devicePixelRatio||1,2);
-      const w=cv.offsetWidth,h=cv.offsetHeight;
-      cv.width=w*dpr;cv.height=h*dpr;
-      cx.setTransform(dpr,0,0,dpr,0,0);
-      draw(w,h);
-    }
+    function resize(){const [w,h]=fitCanvas(cv);draw(w,h);}
     function init(){
-      if(drawn) return;
-      drawn=true;
-      resize();
-      let rt; window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(resize,200);});
+      if(drawn) return; drawn=true; resize();
+      let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(resize,220);});
     }
-    // 滚动到书架附近再绘制，减少首屏开销
     if('IntersectionObserver' in window){
       const io=new IntersectionObserver(entries=>{
         if(entries.some(e=>e.isIntersecting)){io.disconnect();init();}
       },{rootMargin:'400px'});
       io.observe(cv);
-    } else {
-      setTimeout(init,100);
-    }
+    } else { setTimeout(init,100); }
   })();
 })();
 
-// ── CONTACTS ──────────────────────────────
+// ── 留言台 ──
 (function(){
   const c=document.getElementById('ci');
-  [{icon:'message-circle',label:'微信',fn:()=>document.getElementById('wc-modal').classList.add('on')},
-   {icon:'mail',label:'邮箱',fn:()=>navigator.clipboard.writeText(CONFIG.contacts.email).then(()=>toast('已复制邮箱：'+CONFIG.contacts.email)).catch(()=>toast(CONFIG.contacts.email))},
-   {icon:'github',label:'GitHub',fn:()=>window.open(CONFIG.contacts.github,'_blank','noopener')},
-   {icon:'book-open',label:'CSDN',fn:()=>window.open(CONFIG.contacts.csdn,'_blank','noopener')},
+  [{icon:'message-circle',name:'微信',hint:'扫码添加，备注来意',fn:()=>document.getElementById('wc-modal').classList.add('on')},
+   {icon:'mail',name:'邮箱',hint:CONFIG.contacts.email+' · 点击复制',fn:()=>navigator.clipboard.writeText(CONFIG.contacts.email).then(()=>toast('已复制邮箱：'+CONFIG.contacts.email)).catch(()=>toast(CONFIG.contacts.email))},
+   {icon:'github',name:'GitHub',hint:'代码与开源项目',fn:()=>window.open(CONFIG.contacts.github,'_blank','noopener')},
+   {icon:'book-open',name:'CSDN',hint:'技术博客 1.5K 订阅',fn:()=>window.open(CONFIG.contacts.csdn,'_blank','noopener')},
   ].forEach(item=>{
-    const btn=document.createElement('button');btn.className='c-btn';btn.setAttribute('aria-label',item.label);btn.innerHTML=`<i data-lucide="${item.icon}" style="width:22px;height:22px;"></i>`;btn.addEventListener('click',item.fn);
-    const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:8px;';
-    const lbl=document.createElement('span');lbl.textContent=item.label;lbl.style.cssText='font-size:12px;color:var(--gray);';
-    wrap.appendChild(btn);wrap.appendChild(lbl);c.appendChild(wrap);
+    const btn=document.createElement('button');btn.className='c-row';btn.setAttribute('aria-label',item.name);
+    btn.innerHTML=`<span class="l"><i data-lucide="${item.icon}"></i><span><span class="name">${item.name}</span><br><span class="hint">${item.hint}</span></span></span><span class="arr">→</span>`;
+    btn.addEventListener('click',item.fn);
+    c.appendChild(btn);
   });
   lucide.createIcons();
 })();
-
-// ── RPG GAME SCREEN ───────────────────────
+</script>
+<script>
+// ── RPG GAME SCREEN ──
 (function(){
   const lv=getLv();
   document.getElementById('play-yrs').textContent=lv;
   document.getElementById('cn').textContent=CONFIG.character.name;
   document.getElementById('cl').textContent='Lv.'+lv;
   document.getElementById('cj').textContent=CONFIG.character.job;
-  // HP = Lv × 10, MP = skill sum × 100/40
   const skillSum=CONFIG.equipment.reduce((a,e)=>a+e.lv,0);
   const maxHP=lv*10, curHP=maxHP;
   const maxMP=100, curMP=Math.round(skillSum/40*100);
@@ -756,7 +833,6 @@ window.addEventListener('load',()=>{
   document.getElementById('hp-bar').dataset.w=Math.round(curHP/maxHP*100);
   document.getElementById('mp-bar').dataset.w=curMP;
 
-  // Equipment: left side = [0,2], right side = [1,3]
   function makeEqSlot(eq){
     const slot=document.createElement('div');
     slot.className='eq-slot';
@@ -775,7 +851,6 @@ window.addEventListener('load',()=>{
   document.getElementById('eq-right').appendChild(makeEqSlot(CONFIG.equipment[1]));
   document.getElementById('eq-right').appendChild(makeEqSlot(CONFIG.equipment[3]));
 
-  // Floating +N particles
   function spawnParticle(){
     const slots=document.querySelectorAll('.eq-slot');
     if(!slots.length) return;
@@ -790,7 +865,6 @@ window.addEventListener('load',()=>{
   }
   let particleInterval=null;
 
-  // Achievements
   const al=document.getElementById('acl');
   CONFIG.achievements.forEach(a=>{
     const b=document.createElement('div');b.className='ach-badge';
@@ -798,7 +872,6 @@ window.addEventListener('load',()=>{
     al.appendChild(b);
   });
 
-  // Timeline
   const tl=document.getElementById('tll');
   CONFIG.timeline.forEach(item=>{
     const n=document.createElement('div');n.className='tl-n';n.tabIndex=0;
@@ -810,17 +883,11 @@ window.addEventListener('load',()=>{
 
   lucide.createIcons();
 
-  // Expose for openLife
-  window._startParticles=()=>{
-    if(particleInterval) return;
-    particleInterval=setInterval(spawnParticle,900);
-  };
-  window._stopParticles=()=>{
-    clearInterval(particleInterval);particleInterval=null;
-  };
+  window._startParticles=()=>{ if(particleInterval) return; particleInterval=setInterval(spawnParticle,900); };
+  window._stopParticles=()=>{ clearInterval(particleInterval);particleInterval=null; };
 })();
 
-// ── LIFE PANEL OPEN/CLOSE ─────────────────
+// ── LIFE PANEL OPEN/CLOSE ──
 const PANELS=['#rv-char','#rv-ac','#rv-tl'];
 
 function openLife(){
@@ -864,7 +931,12 @@ function _ap(){
 function _rb(){
   document.querySelectorAll('.stat-track-fill').forEach(b=>gsap.set(b,{width:'0%'}));
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('life-ov').style.display==='block')closeLife();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('life-ov').style.display==='block')closeLife();
+    document.getElementById('wc-modal').classList.remove('on');
+  }
+});
 </script>
 </body>
 </html>
